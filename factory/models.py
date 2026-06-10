@@ -42,8 +42,14 @@ class Machine(models.Model):
         return self.production_rate * self.working_hours
 
     def efficiency(self):
-        max_output = 1000
-        return round((self.total_production() / max_output) * 100, 2)
+
+        if self.target_production == 0:
+            return 0
+
+        return round(
+            (self.total_production() / self.target_production) * 100,
+            2
+        )
 
     def __str__(self):
         return self.name
