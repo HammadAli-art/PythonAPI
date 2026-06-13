@@ -41,11 +41,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-a_2jc5$9%zu(5@k0t)qn7_7u_$3)n()ql(=apcu!yeo@dx!o8y'
 
 # Enable debug mode for development (set False in production)
-DEBUG = True
+DEBUG = False
 
 # Hosts allowed to connect to this Django server
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['*']
 
 # --------------------------------------------------
 # Installed Applications
@@ -158,8 +157,7 @@ USE_TZ = True     # Store datetimes as timezone-aware
 # URL prefix for serving CSS, JS, images
 # --------------------------------------------------
 STATIC_URL = 'static/'
-
-
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 # --------------------------------------------------
 # Default Primary Key Field Type
 # All models will use BigAutoField (64-bit integer) as default PK

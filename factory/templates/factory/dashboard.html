@@ -2,431 +2,227 @@
 <html>
 
 <head>
-
-    <title>Digital Twin Dashboard</title>
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-          rel="stylesheet">
-          <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Digital Twin Factory Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
-
-        body{
-            background-color:#f4f6f9;
+        body {
+            background: #f4f6f9;
         }
 
-        .navbar-brand{
-            font-weight:bold;
+        .sidebar {
+            background: #1e293b;
+            min-height: 100vh;
+            color: white;
+            padding-top: 20px;
         }
 
-        .dashboard-card{
-            border:none;
-            border-radius:15px;
-            box-shadow:0 2px 10px rgba(0,0,0,0.1);
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 5px 10px;
         }
 
-        .sidebar{
-            background:#212529;
-            min-height:100vh;
-            color:white;
-            padding-top:20px;
+        .sidebar a:hover {
+            background: #334155;
         }
 
-        .sidebar a{
-            color:white;
-            text-decoration:none;
-            display:block;
-            padding:12px;
+        .content {
+            padding: 20px;
         }
 
-        .sidebar a:hover{
-            background:#343a40;
+        .dashboard-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         }
 
-        .content{
-            padding:20px;
+        .machine-container {
+            max-height: 550px;
+            overflow-y: auto;
         }
 
+        .machine-card {
+            border: none;
+            border-radius: 15px;
+            transition: 0.3s;
+            cursor: pointer;
+            margin-bottom: 15px;
+            color: white;
+        }
+
+        .machine-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .running {
+            background: #198754;
+        }
+
+        .stopped {
+            background: #dc3545;
+        }
+
+        .maintenance {
+            background: #fd7e14;
+        }
+
+        .machine-link {
+            text-decoration: none;
+        }
     </style>
-
 </head>
 
 <body>
 
-<nav class="navbar navbar-dark bg-dark">
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <span class="navbar-brand me-auto ms-3">
+                Digital Twin Dashboard
+            </span>
+        </div>
+    </nav>
+
+
     <div class="container-fluid">
-        <span class="navbar-brand">
-            🏭 Digital Twin Factory Dashboard
-        </span>
-    </div>
-</nav>
+        <div class="row">
 
-<div class="container-fluid">
-
-    <div class="row">
-
-        <div class="col-md-2 sidebar">
-
-            <h4 class="text-center">
-                Menu
-            </h4>
-
-            <a href="#">Dashboard</a>
-
-            <a href="/api/machines/">
-                API Data
-            </a>
-
-            <a href="/swagger/">
-                Swagger
-            </a>
-
-            <a href="/admin/">
-                Admin
-            </a>
-
-        </div>
-
-        <div class="col-md-10 content">
-
-            <h2 class="mb-4">
-                Factory Overview
-            </h2>
-
-            <div class="row">
-
-                <div class="col-md-3">
-
-                    <div class="card dashboard-card text-center bg-primary text-white">
-
-                        <div class="card-body">
-
-                            <h5>Total Machines</h5>
-
-                            <h1>
-                                {{ total_machines }}
-                            </h1>
-
-                        </div>
-
-                    </div>
-
+            <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu">
+                <div class="offcanvas-header">
+                    <h5>Dashboard Menu</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
                 </div>
-
-                <div class="col-md-3">
-
-                    <div class="card dashboard-card text-center bg-success text-white">
-
-                        <div class="card-body">
-
-                            <h5>Running</h5>
-
-                            <h1>
-                                {{ running_machines }}
-                            </h1>
-
-                        </div>
-
-                    </div>
-
+                <div class="offcanvas-body">
+                    <a href="/all/" class="btn btn-outline-dark w-100 mb-2">All</a>
+                    <a href="/running/" class="btn btn-outline-dark w-100 mb-2">Running</a>
+                    <a href="/stopped/" class="btn btn-outline-dark w-100 mb-2">Stopped</a>
+                    <a href="/maintenance/" class="btn btn-outline-dark w-100 mb-2">Maintenance</a>
+                    <hr>
+                    <a href="/temperature/" class="btn btn-outline-primary w-100 mb-2">Temperature Monitoring</a>
+                    <a href="/health/" class="btn btn-outline-primary w-100 mb-2">Machine Health</a>
+                    <a href="/production/" class="btn btn-outline-primary w-100 mb-2">Production Analysis</a>
                 </div>
-
-                <div class="col-md-3">
-
-                    <div class="card dashboard-card text-center bg-danger text-white">
-
-                        <div class="card-body">
-
-                            <h5>Stopped</h5>
-
-                            <h1>
-                                {{ stopped_machines }}
-                            </h1>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <div class="col-md-3">
-
-                    <div class="card dashboard-card text-center bg-warning">
-
-                        <div class="card-body">
-
-                            <h5>Average Health</h5>
-
-                            <h1>
-                                {{ avg_health }}%
-                            </h1>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
             </div>
 
-            <div class="row mt-4">
 
-    <div class="col-md-6">
+            <div class="col-md-12 content">
 
-        <div class="card dashboard-card">
+                <h2 class="mb-4">Factory Overview</h2>
 
-            <div class="card-body">
+                <div class="row g-3">
 
-                <h5>Temperature Monitoring</h5>
-
-                <canvas id="temperatureChart"></canvas>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    <div class="col-md-6">
-
-        <div class="card dashboard-card">
-
-            <div class="card-body">
-
-                <h5>Machine Health</h5>
-
-                <canvas id="healthChart"></canvas>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-
-<br>
-
-<div class="card dashboard-card">
-
-    <div class="card-body">
-
-        <h5>Production Analysis</h5>
-
-        <canvas id="productionChart"></canvas>
-
-    </div>
-
-</div>
-
-<hr>
-
-            <hr>
-
-            <h3>
-                Machine Monitoring
-            </h3>
-
-            <table class="table table-hover table-bordered bg-white">
-
-                <thead class="table-dark">
-
-                    <tr>
-
-                        <th>Name</th>
-                        <th>Status</th>
-                        <th>Temperature</th>
-                        <th>Health</th>
-                        <th>Production</th>
-                        <th>Efficiency</th>
-                        <th>Alert</th>
-
-                    </tr>
-
-                </thead>
-
-                <tbody>
-
-                {% for machine in machines %}
-
-                    <tr>
-
-                        <td>
-                            {{ machine.name }}
-                        </td>
-
-                        <td>
-
-                            {% if machine.status == 'Running' %}
-
-                                <span class="badge bg-success">
-                                    Running
-                                </span>
-
-                            {% elif machine.status == 'Stopped' %}
-
-                                <span class="badge bg-danger">
-                                    Stopped
-                                </span>
-
-                            {% else %}
-
-                                <span class="badge bg-warning">
-                                    Maintenance
-                                </span>
-
-                            {% endif %}
-
-                        </td>
-
-                        <td>
-
-                            {{ machine.temperature }} °C
-
-                        </td>
-
-                        <td>
-
-                            <div class="progress">
-
-                                <div class="progress-bar"
-                                     style="width: {{ machine.machine_health }}%">
-
-                                    {{ machine.machine_health }}%
-
-                                </div>
-
+                    <div class="col-md">
+                        <div class="card dashboard-card bg-primary text-white">
+                            <div class="card-body text-center">
+                                <h5>Total Machines</h5>
+                                <h2>{{ total_machines }}</h2>
                             </div>
+                        </div>
+                    </div>
 
-                        </td>
+                    <div class="col-md">
+                        <div class="card dashboard-card bg-success text-white">
+                            <div class="card-body text-center">
+                                <h5>Running</h5>
+                                <h2>{{ running_machines }}</h2>
+                            </div>
+                        </div>
+                    </div>
 
-                        <td>
+                    <div class="col-md">
+                        <div class="card dashboard-card bg-danger text-white">
+                            <div class="card-body text-center">
+                                <h5>Stopped</h5>
+                                <h2>{{ stopped_machines }}</h2>
+                            </div>
+                        </div>
+                    </div>
 
-                            {{ machine.total_production }}
+                    <div class="col-md">
+                        <div class="card dashboard-card bg-warning">
+                            <div class="card-body text-center">
+                                <h5>Maintenance</h5>
+                                <h2>{{ maintenance_machines }}</h2>
+                            </div>
+                        </div>
+                    </div>
 
-                        </td>
+                    <div class="col-md">
+                        <div class="card dashboard-card bg-info text-white">
+                            <div class="card-body text-center">
+                                <h5>Average Health</h5>
+                                <h2>{{ avg_health }}%</h2>
+                            </div>
+                        </div>
+                    </div>
 
-                        <td>
+                </div>
 
-                            {{ machine.efficiency }}%
 
-                        </td>
+                <hr class="mt-5">
 
-                        <td>
 
-                            {% if machine.temperature > 80 %}
+                <h3 class="mb-4">Quick Access</h3>
 
-                                <span class="badge bg-danger">
-                                    🔥 High Temp
-                                </span>
+                <div class="row g-4">
 
-                            {% elif machine.machine_health < 50 %}
+                    <div class="col-md-3">
+                        <a href="/all/" class="text-decoration-none">
+                            <div class="card shadow">
+                                <div class="card-body text-center">
+                                    <h4>🏭</h4>
+                                    <h5>All Machines</h5>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
 
-                                <span class="badge bg-warning text-dark">
-                                    ⚠ Service Required
-                                </span>
+                    <div class="col-md-3">
+                        <a href="/running/" class="text-decoration-none">
+                            <div class="card shadow">
+                                <div class="card-body text-center">
+                                    <h4>🟢</h4>
+                                    <h5>Running</h5>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
 
-                            {% else %}
+                    <div class="col-md-3">
+                        <a href="/stopped/" class="text-decoration-none">
+                            <div class="card shadow">
+                                <div class="card-body text-center">
+                                    <h4>🔴</h4>
+                                    <h5>Stopped</h5>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
 
-                                <span class="badge bg-success">
-                                    Normal
-                                </span>
+                    <div class="col-md-3">
+                        <a href="/maintenance/" class="text-decoration-none">
+                            <div class="card shadow">
+                                <div class="card-body text-center">
+                                    <h4>🟠</h4>
+                                    <h5>Maintenance</h5>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
 
-                            {% endif %}
+                </div>
 
-                        </td>
-
-                    </tr>
-
-                {% endfor %}
-
-                </tbody>
-
-            </table>
-
+                </div>
         </div>
-
     </div>
 
-</div>
-<script>
-
-const machineNames =
-{{ machine_names|safe }};
-
-const temperatures =
-{{ temperatures|safe }};
-
-const healthValues =
-{{ health_values|safe }};
-
-const productionValues =
-{{ production_values|safe }};
-
-
-new Chart(
-    document.getElementById('temperatureChart'),
-    {
-        type: 'bar',
-
-        data: {
-
-            labels: machineNames,
-
-            datasets: [{
-                label: 'Temperature °C',
-                data: temperatures
-            }]
-        }
-    }
-);
-
-
-new Chart(
-    document.getElementById('healthChart'),
-    {
-        type: 'pie',
-
-        data: {
-
-            labels: machineNames,
-
-            datasets: [{
-                data: healthValues
-            }]
-        }
-    }
-);
-
-
-new Chart(
-    document.getElementById('productionChart'),
-    {
-        type: 'line',
-
-        data: {
-
-            labels: machineNames,
-
-            datasets: [{
-
-                label: 'Production',
-
-                data: productionValues
-
-            }]
-        }
-    }
-);
-
-setTimeout(function(){
-
-    location.reload();
-
-},5000);
-
-</script>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
